@@ -515,26 +515,27 @@
             setSubtitle("清 浊 辨 晰", "CLARITY");
             await animateTo('colorLevel', 1, 12000, easeInOut);
 
-            // --- 循环段落 ---
+            // --- 循环段落: 互易循环 2 次 ---
             for (let i = 0; i < 2; i++) {
                 
+                // 生眼 (从纯色块中生出)
                 setSubtitle(i === 0 ? "极 处 生 变" : "周 而 复 始", i === 0 ? "INCEPTION" : "RECURRENCE");
-                
-                // 第二次循环前的重置逻辑
-                if (i === 1) {
-                    setSubtitle("阴 阳 消 长", "RECEDING");
-                    await Promise.all([
-                        animateTo('swapProgress', 0, 8000, easeInOut),
-                        animateTo('eyeSize', 0, 8000, easeInOut)
-                    ]);
-                    setSubtitle("周 而 复 始", "RECURRENCE");
-                }
-
                 await animateTo('eyeSize', 30, 9000, easeInOut);
                 await wait(3000);
 
+                // 互易 (吞噬)
                 setSubtitle("阴 阳 互 易", "TRANSFORMATION");
                 await animateTo('swapProgress', 1, 18000, easeInOut);
+                
+                // --- 幕后无缝衔接 ---
+                // 此时 swapProgress = 1，画面完全被覆盖（反色）。
+                // 我们瞬间切换基底颜色 (baseInverted = !baseInverted)，并把 swapProgress 重置为 0。
+                // 视觉上，这一帧前后像素是完全一样的，没有任何跳变。
+                state.baseInverted = !state.baseInverted;
+                state.swapProgress = 0;
+                state.eyeSize = 0; // 眼也归零，回到纯色块状态
+                
+                // 此时画面是纯色块（反转后的），准备进入下一轮生眼
             }
 
             // 6. 复归
